@@ -1,0 +1,6 @@
+# Kredensial firmware (WiFi & Firebase) tidak diunggah ke repositori.
+Final_Embed/config.h
+
+# Artefak sistem
+.DS_Store
+Thumbs.db

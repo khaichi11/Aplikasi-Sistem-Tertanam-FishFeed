@@ -1,30 +1,45 @@
-// This is a basic Flutter widget test.
+// Pengujian unit untuk logika interpretasi sensor.
 //
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
+// Logika ini murni (tanpa Firebase/Flutter) sehingga dapat diuji cepat tanpa
+// inisialisasi perangkat.
 
-import 'package:flutter/material.dart';
+import 'package:embed/sensor_status.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:embed/main.dart';
-
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget( MyFishApp());
+  group('feedLevelStatus', () {
+    test('jarak besar berarti wadah kosong', () {
+      expect(feedLevelStatus(6).severity, Severity.bad);
+    });
+    test('jarak menengah berarti setengah', () {
+      expect(feedLevelStatus(4).severity, Severity.warning);
+    });
+    test('jarak kecil berarti penuh', () {
+      expect(feedLevelStatus(1).severity, Severity.good);
+    });
+    test('null tidak diketahui', () {
+      expect(feedLevelStatus(null).severity, Severity.unknown);
+    });
+  });
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+  group('turbidityStatus', () {
+    test('di atas ambang berarti keruh', () {
+      expect(turbidityStatus(120).severity, Severity.bad);
+    });
+    test('di bawah ambang berarti jernih', () {
+      expect(turbidityStatus(10).severity, Severity.good);
+    });
+  });
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
-
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+  group('batteryStatus', () {
+    test('baterai rendah kritis', () {
+      expect(batteryStatus(10).severity, Severity.bad);
+    });
+    test('baterai sedang peringatan', () {
+      expect(batteryStatus(40).severity, Severity.warning);
+    });
+    test('baterai penuh baik', () {
+      expect(batteryStatus(90).severity, Severity.good);
+    });
   });
 }

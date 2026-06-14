@@ -1,16 +1,35 @@
-# embed
+# FishFeed (Aplikasi Flutter)
 
-A new Flutter project.
+Aplikasi seluler pengendali alat pemberi pakan ikan otomatis berbasis ESP32.
+Dokumentasi lengkap proyek (perangkat keras, firmware, dan struktur data
+Firebase) berada di [README utama](../README.md).
 
-## Getting Started
+## Struktur kode
 
-This project is a starting point for a Flutter application.
+```
+lib/
+├── main.dart                 Titik masuk dan inisialisasi tema
+├── auth_wrapper.dart         Pengalih halaman berdasarkan status login
+├── login_page.dart           Halaman masuk
+├── signup_page.dart          Halaman pendaftaran
+├── dashboard_page.dart       Layar utama: telemetri dan kendali
+├── schedule_page.dart        Pengaturan jadwal pemberian pakan
+├── activity_log_page.dart    Riwayat aktivitas perangkat
+├── device_manager_page.dart  Pemasangan dan penghapusan perangkat
+├── feed_success_page.dart    Konfirmasi pemberian pakan
+├── models/                   Model data (riwayat aktivitas)
+├── services/                 Lapisan akses Firebase
+├── widgets/                  Komponen UI yang dapat dipakai ulang
+├── theme/                    Tema dan palet warna
+└── utils/                    Fungsi bantu
+```
 
-A few resources to get you started if this is your first Flutter project:
+## Menjalankan
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+```
+flutter pub get
+flutter run
+```
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Konfigurasi Firebase (`google-services.json` untuk Android) tidak disertakan di
+repositori dan harus ditambahkan sendiri.

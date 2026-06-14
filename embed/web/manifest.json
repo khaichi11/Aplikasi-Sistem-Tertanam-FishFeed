@@ -1,11 +1,11 @@
 {
-    "name": "embed",
-    "short_name": "embed",
+    "name": "FishFeed",
+    "short_name": "FishFeed",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#1565C0",
+    "theme_color": "#1565C0",
+    "description": "Pengendali pemberi pakan ikan otomatis berbasis ESP32.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
