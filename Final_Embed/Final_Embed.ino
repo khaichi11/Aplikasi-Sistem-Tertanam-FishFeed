@@ -1,3 +1,29 @@
+/*
+ * FishFeed - Firmware ESP32 untuk pemberi pakan ikan otomatis.
+ *
+ * Tanggung jawab firmware:
+ *   - Membaca sensor: kekeruhan air, jarak permukaan pakan (ultrasonik), dan
+ *     tegangan baterai.
+ *   - Mengirim telemetri ke Firebase Realtime Database secara berkala.
+ *   - Menjalankan pemberian pakan saat menerima perintah manual dari aplikasi.
+ *   - Menjalankan pemberian pakan terjadwal berdasarkan RTC DS3231.
+ *   - Mencatat pemberian pakan terjadwal ke riwayat aktivitas.
+ *
+ * Tugas dijalankan sebagai task FreeRTOS yang terpisah. Setiap siklus, ESP32
+ * aktif selama beberapa detik lalu masuk deep sleep untuk menghemat daya
+ * (lihat AWAKE_DURATION_MS dan DEEP_SLEEP_US).
+ *
+ * Kredensial WiFi dan Firebase berada di config.h (tidak diunggah ke Git).
+ * Salin config.example.h menjadi config.h sebelum melakukan kompilasi.
+ *
+ * Struktur data Realtime Database:
+ *   devices/{id}/status/online    bool
+ *   devices/{id}/sensors          objek telemetri
+ *   commands/{id}/current_command perintah dari aplikasi
+ *   schedules/{id}                jadwal pemberian pakan
+ *   activity/{id}                 riwayat aktivitas
+ */
+
 #include <WiFi.h>
 #include <Firebase_ESP_Client.h>
 #include <Wire.h>
@@ -9,34 +35,36 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 
-static int lastFedMinute = -1;
+#include "config.h"
 
-#define WIFI_SSID       "A52wifi"
-#define WIFI_PASSWORD   "halo12345"
-#define API_KEY         ""
-#define DATABASE_URL    "" 
-#define USER_EMAIL      ""
-#define USER_PASSWORD   "123456"
-#define DEVICE_ID       "FF-2024"
+// --- Pin perangkat keras ---------------------------------------------------
+#define BATT_DIV_PIN    32   // Pembagi tegangan baterai
+#define TURBIDITY_PIN   34   // Sensor kekeruhan (analog)
+#define TRIG_PIN        5    // Trigger sensor ultrasonik
+#define ECHO_PIN        18   // Echo sensor ultrasonik
+#define SERVO_PIN       13   // Servo penggerak katup pakan
 
-#define BATT_DIV_PIN    32
-#define TURBIDITY_PIN   34
-#define TRIG_PIN        5
-#define ECHO_PIN        18
-#define SERVO_PIN       13
-
-#define V0              3.0f
-#define V100            1.5f
+// --- Kalibrasi sensor kekeruhan -------------------------------------------
+#define V0              3.0f    // Tegangan keluaran pada 0 NTU
+#define V100            1.5f    // Tegangan keluaran pada 100 NTU
 #define NTU100          100.0f
 
-#define SLEEP_US        5000ULL * 1000ULL
-#define SENSOR_READ_INTERVAL 5000
-#define RTC_SYNC_INTERVAL   60000
-#define COMMAND_CHECK_INTERVAL 10000
+// --- Posisi servo ----------------------------------------------------------
+// Sudut dalam derajat (0-180). Sesuaikan bila mekanisme katup berbeda.
+#define SERVO_REST_POSITION    0     // Posisi tertutup (diam)
+#define SERVO_FEED_POSITION    180   // Posisi membuka katup untuk menjatuhkan pakan
+#define SERVO_FEED_DURATION_MS 1000  // Lama katup terbuka per pemberian pakan
+
+// --- Pengaturan waktu ------------------------------------------------------
+#define AWAKE_DURATION_MS       5000ULL          // Durasi aktif sebelum deep sleep
+#define DEEP_SLEEP_US           (5000ULL * 1000) // Durasi deep sleep (mikrodetik)
+#define SENSOR_READ_INTERVAL    5000
+#define RTC_SYNC_INTERVAL       60000
+#define COMMAND_CHECK_INTERVAL  10000
 #define SCHEDULE_CHECK_INTERVAL 10000
 
 const char* ntpServer = "pool.ntp.org";
-const long gmtOffset = 7 * 3600;
+const long gmtOffset = 7 * 3600;  // WIB (UTC+7)
 const int daylightOffset = 0;
 
 RTC_DS3231 rtc;
@@ -65,6 +93,36 @@ typedef struct {
 
 SensorData sensorData;
 
+// Menjalankan servo satu siklus untuk menjatuhkan pakan.
+void dispenseFeed() {
+  feederServo.write(SERVO_FEED_POSITION);
+  vTaskDelay(SERVO_FEED_DURATION_MS / portTICK_PERIOD_MS);
+  feederServo.write(SERVO_REST_POSITION);
+}
+
+// Membuat timestamp ISO 8601 dari waktu RTC saat ini.
+void buildIsoTimestamp(const DateTime& now, char* buffer, size_t size) {
+  snprintf(buffer, size, "%04d-%02d-%02dT%02d:%02d:%02d",
+           now.year(), now.month(), now.day(),
+           now.hour(), now.minute(), now.second());
+}
+
+// Mencatat satu aktivitas pemberian pakan ke riwayat di Realtime Database.
+void logFeedActivity(const char* mode) {
+  DateTime now = rtc.now();
+  char ts[25];
+  buildIsoTimestamp(now, ts, sizeof(ts));
+
+  FirebaseJson activity;
+  activity.set("type", "feed");
+  activity.set("mode", mode);
+  activity.set("timestamp", ts);
+  activity.set("source", "device");
+
+  String path = "/activity/" + String(DEVICE_ID);
+  Firebase.RTDB.pushJSON(&fbdo, path.c_str(), &activity);
+}
+
 void clearOscFlag() {
   Wire.beginTransmission(0x68);
   Wire.write(0x0F);
@@ -83,10 +141,10 @@ void syncDS3231toNTP() {
 
   struct tm tm;
   if (!getLocalTime(&tm)) {
-    Serial.println("Gagal ambil waktu NTP");
+    Serial.println("Gagal mengambil waktu NTP");
     return;
   }
-  Serial.printf("NTP time: %04d-%02d-%02d %02d:%02d:%02d\n",
+  Serial.printf("Waktu NTP: %04d-%02d-%02d %02d:%02d:%02d\n",
                 tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday,
                 tm.tm_hour, tm.tm_min, tm.tm_sec);
 
@@ -96,7 +154,7 @@ void syncDS3231toNTP() {
   ));
 
   DateTime t2 = rtc.now();
-  Serial.printf("RTC after set: %04d-%02d-%02d %02d:%02d:%02d\n",
+  Serial.printf("RTC setelah disetel: %04d-%02d-%02d %02d:%02d:%02d\n",
                 t2.year(), t2.month(), t2.day(),
                 t2.hour(), t2.minute(), t2.second());
 
@@ -106,7 +164,7 @@ void syncDS3231toNTP() {
 void ensureRtcValid() {
   DateTime t = rtc.now();
   if (t.year() < 2023 || abs(t.second() - (int)time(nullptr) % 60) > 5) {
-    Serial.println("RTC aneh, re-sync NTP");
+    Serial.println("Waktu RTC tidak wajar, sinkronisasi ulang NTP");
     syncDS3231toNTP();
   }
 }
@@ -170,8 +228,7 @@ void sendSensorDataTask(void *pvParameters) {
   for (;;) {
     DateTime now = rtc.now();
     char ts[25];
-    sprintf(ts, "%04d-%02d-%02dT%02d:%02d:%02d",
-            now.year(), now.month(), now.day(), now.hour(), now.minute(), now.second());
+    buildIsoTimestamp(now, ts, sizeof(ts));
 
     xSemaphoreTake(dataMutex, portMAX_DELAY);
     sensorData.timestamp[0] = '\0';
@@ -191,7 +248,7 @@ void sendSensorDataTask(void *pvParameters) {
       vTaskDelay(100 / portTICK_PERIOD_MS);
       Firebase.RTDB.setJSON(&fbdo, path.c_str(), &j);
     }
-    Serial.printf("Sent: ntu=%.1f dist=%ld bat=%.2fV %d%% @%s\n",
+    Serial.printf("Terkirim: ntu=%.1f jarak=%ld baterai=%.2fV %d%% @%s\n",
                   sensorData.turbidity_ntu, sensorData.distance_cm,
                   sensorData.battery_voltage, sensorData.battery_percent, ts);
 
@@ -218,11 +275,9 @@ void checkForCommandsTask(void *pvParameters) {
     if (fbdo.stringData() == "pending") {
       if (Firebase.RTDB.getString(&fbdo, (base + "/type").c_str())
           && fbdo.stringData() == "feed") {
-        feederServo.write(360);
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
-        feederServo.write(0);
+        dispenseFeed();
         Firebase.RTDB.setString(&fbdo, statusPath.c_str(), "done");
-        Serial.println(">> Feeding done");
+        Serial.println("Pemberian pakan manual selesai");
       }
     }
     vTaskDelay(COMMAND_CHECK_INTERVAL / portTICK_PERIOD_MS);
@@ -234,7 +289,7 @@ void checkScheduleTask(void *pvParameters) {
     String schedPath = "/schedules/" + String(DEVICE_ID);
 
     if (!Firebase.RTDB.getJSON(&fbdo, schedPath.c_str())) {
-      Serial.printf("❌ Gagal baca schedule: %s\n", fbdo.errorReason().c_str());
+      Serial.printf("Gagal membaca jadwal: %s\n", fbdo.errorReason().c_str());
       vTaskDelay(SCHEDULE_CHECK_INTERVAL / portTICK_PERIOD_MS);
       continue;
     }
@@ -248,7 +303,7 @@ void checkScheduleTask(void *pvParameters) {
     }
 
     if (!root.get(jd, "entries")) {
-      Serial.println("⚠ Tidak ada child 'entries'");
+      Serial.println("Tidak ada child 'entries' pada jadwal");
       vTaskDelay(SCHEDULE_CHECK_INTERVAL / portTICK_PERIOD_MS);
       continue;
     }
@@ -291,11 +346,10 @@ void checkScheduleTask(void *pvParameters) {
       String lastRun = jd.stringValue;
 
       if (hh == nowH && mm == nowM && lastRun != today) {
-        Serial.printf(">> Scheduled feed @ %02d:%02d (entry %s)\n",
+        Serial.printf("Pemberian pakan terjadwal @ %02d:%02d (entry %s)\n",
                       hh, mm, key.c_str());
-        feederServo.write(180);
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
-        feederServo.write(0);
+        dispenseFeed();
+        logFeedActivity("auto");
 
         String lrPath = schedPath + "/entries/" + key + "/last_run";
         Firebase.RTDB.setString(&fbdo, lrPath.c_str(), today);
@@ -321,7 +375,7 @@ void setup() {
 
   Wire.begin(21, 22);
   if (!rtc.begin()) {
-    Serial.println("RTC tidak terdeteksi!");
+    Serial.println("RTC tidak terdeteksi");
     while (1);
   }
   clearOscFlag();
@@ -343,7 +397,7 @@ void setup() {
   Firebase.reconnectWiFi(true);
 
   feederServo.attach(SERVO_PIN);
-  feederServo.write(0);
+  feederServo.write(SERVO_REST_POSITION);
   analogSetWidth(12);
   analogSetPinAttenuation(TURBIDITY_PIN, ADC_11db);
 
@@ -363,7 +417,8 @@ void setup() {
   xTaskCreatePinnedToCore(checkScheduleTask, "Schedule Task", 8192, NULL, 2, &scheduleTaskHandle, 1);
   xTaskCreatePinnedToCore(rtcSyncTask, "RTC Sync Task", 4096, NULL, 1, &rtcSyncTaskHandle, 0);
 
-  vTaskDelay(SLEEP_US / 1000 / portTICK_PERIOD_MS);
+  // Biarkan tugas berjalan beberapa saat, lalu hentikan dan masuk deep sleep.
+  vTaskDelay(AWAKE_DURATION_MS / portTICK_PERIOD_MS);
 
   vTaskDelete(turbidityTaskHandle);
   vTaskDelete(ultrasonicTaskHandle);
@@ -371,11 +426,11 @@ void setup() {
   vTaskDelete(scheduleTaskHandle);
   vTaskDelete(commandTaskHandle);
 
-  Serial.printf("Deep sleep %llu ms...\n", SLEEP_US / 1000);
-  esp_sleep_enable_timer_wakeup(SLEEP_US);
+  Serial.printf("Deep sleep %llu ms\n", DEEP_SLEEP_US / 1000);
+  esp_sleep_enable_timer_wakeup(DEEP_SLEEP_US);
   esp_deep_sleep_start();
 }
 
 void loop() {
-  // Empty loop, as tasks are handled by FreeRTOS
+  // Kosong: seluruh pekerjaan ditangani oleh task FreeRTOS di setup().
 }

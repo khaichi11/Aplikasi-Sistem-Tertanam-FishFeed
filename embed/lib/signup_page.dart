@@ -1,10 +1,15 @@
-// --- FILE: signup_page.dart ---
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import 'theme/app_theme.dart';
+
+/// Halaman pendaftaran akun baru. Selain membuat akun di Firebase
+/// Authentication, dokumen pengguna juga dibuat di Firestore untuk menyimpan
+/// daftar perangkat.
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
+
   @override
   State<SignUpPage> createState() => _SignUpPageState();
 }
@@ -18,7 +23,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
   Future<void> _signUp() async {
     if (_passC.text != _confirmC.text) {
-      setState(() => _error = "Kata Sandi Tidak Sesuai");
+      setState(() => _error = 'Kata sandi tidak cocok.');
       return;
     }
     setState(() {
@@ -26,9 +31,10 @@ class _SignUpPageState extends State<SignUpPage> {
       _error = null;
     });
     try {
-      final cred = await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(
-          email: _emailC.text.trim(), password: _passC.text.trim());
+      final cred = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: _emailC.text.trim(),
+        password: _passC.text.trim(),
+      );
       await FirebaseFirestore.instance
           .collection('users')
           .doc(cred.user!.uid)
@@ -42,7 +48,7 @@ class _SignUpPageState extends State<SignUpPage> {
     } on FirebaseAuthException catch (e) {
       setState(() => _error = e.message);
     } finally {
-      setState(() => _loading = false);
+      if (mounted) setState(() => _loading = false);
     }
   }
 
@@ -57,44 +63,59 @@ class _SignUpPageState extends State<SignUpPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Daftar")),
-      body: Padding(
+      appBar: AppBar(title: const Text('Daftar')),
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Column(
           children: [
             if (_error != null)
               Padding(
                 padding: const EdgeInsets.only(bottom: 16),
-                child: Text(_error!, style: const TextStyle(color: Colors.red)),
+                child: Text(
+                  _error!,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: AppColors.bad),
+                ),
               ),
             TextField(
               controller: _emailC,
-              decoration: const InputDecoration(labelText: "Email"),
               keyboardType: TextInputType.emailAddress,
+              decoration: const InputDecoration(
+                labelText: 'Email',
+                prefixIcon: Icon(Icons.email_outlined),
+              ),
             ),
             const SizedBox(height: 16),
             TextField(
               controller: _passC,
-              decoration: const InputDecoration(labelText: "Kata Sandi"),
               obscureText: true,
+              decoration: const InputDecoration(
+                labelText: 'Kata Sandi',
+                prefixIcon: Icon(Icons.lock_outline),
+              ),
             ),
             const SizedBox(height: 16),
             TextField(
               controller: _confirmC,
-              decoration: const InputDecoration(labelText: "Konfirmasi Kata Sandi"),
               obscureText: true,
+              decoration: const InputDecoration(
+                labelText: 'Konfirmasi Kata Sandi',
+                prefixIcon: Icon(Icons.lock_outline),
+              ),
             ),
             const SizedBox(height: 24),
             ElevatedButton(
               onPressed: _loading ? null : _signUp,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.deepPurple,
-                foregroundColor: Colors.white,
-                minimumSize: const Size(double.infinity, 50),
-              ),
               child: _loading
-                  ? const CircularProgressIndicator(color: Colors.white)
-                  : const Text("Daftar"),
+                  ? const SizedBox(
+                      height: 22,
+                      width: 22,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
+                    )
+                  : const Text('Daftar'),
             ),
           ],
         ),
