@@ -14,8 +14,11 @@
 // Kredensial proyek Firebase (Realtime Database + Authentication).
 #define API_KEY         "FIREBASE_WEB_API_KEY"
 #define DATABASE_URL    "https://nama-proyek-default-rtdb.firebaseio.com/"
-#define USER_EMAIL      "akun@contoh.com"
-#define USER_PASSWORD   "KATA_SANDI_AKUN"
+
+// Akun Email/Password khusus perangkat di Firebase Authentication. Jangan
+// pakai akun pribadi.
+#define USER_EMAIL      "perangkat@contoh.com"
+#define USER_PASSWORD   "KATA_SANDI_PERANGKAT"
 
 // Identitas perangkat. Nilai ini juga dipakai sebagai kunci di Realtime
 // Database dan dimasukkan saat memasangkan perangkat di aplikasi.

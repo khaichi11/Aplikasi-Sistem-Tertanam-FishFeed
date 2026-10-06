@@ -172,6 +172,10 @@ Diperlukan Arduino IDE atau `arduino-cli` dengan papan **ESP32** dan pustaka
 
 `config.h` berisi kredensial dan diabaikan oleh Git.
 
+Firmware memakai sekitar 96% ruang program pada skema partisi bawaan, karena
+pustaka Firebase cukup besar. Bila menambah fitur dan ruang tidak cukup, pilih
+**Tools > Partition Scheme > Huge APP (3MB No OTA)**.
+
 Cara kerja satu siklus: perangkat bangun, membaca sensor, terhubung ke WiFi dan
 Firebase, mengirim data, mengecek perintah dan jadwal selama 5 detik, lalu
 tidur 5 detik. Bila WiFi atau Firebase tidak tersedia, perangkat tidur 30 detik
@@ -275,7 +279,8 @@ ESP8266 and ESP32**, **ESP32Servo** and **RTClib** libraries. Copy
 keys, a dedicated device user and `DEVICE_ID`, then upload
 `Final_Embed/Final_Embed.ino` to an **ESP32 Dev Module**. Create
 `devices/{DEVICE_ID}/info/name` in the Realtime Database so the device can be
-paired in the app.
+paired in the app. The firmware uses about 96% of program space with the
+default partition scheme; if you add features, pick **Huge APP (3MB No OTA)**.
 
 Each cycle the device wakes up, reads its sensors, connects to WiFi and
 Firebase, sends data, checks commands and schedules for 5 seconds and sleeps
