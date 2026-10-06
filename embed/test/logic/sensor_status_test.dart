@@ -3,7 +3,7 @@
 // Logika ini murni (tanpa Firebase/Flutter) sehingga dapat diuji cepat tanpa
 // inisialisasi perangkat.
 
-import 'package:fishfeed/sensor_status.dart';
+import 'package:fishfeed/logic/sensor_status.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

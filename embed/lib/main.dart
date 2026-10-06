@@ -1,26 +1,27 @@
-import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
 
-import 'auth_wrapper.dart';
-import 'theme/app_theme.dart';
+import 'app.dart';
+import 'config/firebase_config.dart';
+import 'data/demo_backend.dart';
+import 'data/feeder_backend.dart';
+import 'data/firebase_backend.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  runApp(const FishFeedApp());
+  runApp(FishFeedApp(backend: await _createBackend()));
 }
 
-/// Aplikasi pengendali alat pemberi pakan ikan otomatis berbasis ESP32.
-class FishFeedApp extends StatelessWidget {
-  const FishFeedApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'FishFeed',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.light,
-      home: const AuthWrapper(),
-    );
+/// Memakai Firebase bila konfigurasinya diberikan saat build, dan mode demo
+/// bila tidak. Dengan begitu aplikasi selalu bisa dijalankan.
+Future<FeederBackend> _createBackend() async {
+  if (FirebaseConfig.isConfigured && !FirebaseConfig.forceDemo) {
+    try {
+      await Firebase.initializeApp(options: FirebaseConfig.options);
+      return FirebaseBackend();
+    } catch (error) {
+      debugPrint('Firebase gagal dimulai, beralih ke mode demo: $error');
+    }
   }
+  return DemoBackend();
 }

@@ -59,3 +59,6 @@ firebase/*.tmp
 # Android local settings
 local.properties
 
+
+# Konfigurasi Firebase pribadi. Salin dari firebase.example.json.
+firebase.json

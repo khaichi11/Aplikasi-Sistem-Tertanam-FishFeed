@@ -38,7 +38,9 @@ class SensorThresholds {
 
 /// Menentukan status persediaan pakan dari jarak sensor ultrasonik.
 StatusInfo feedLevelStatus(num? distanceCm) {
-  if (distanceCm == null) return const StatusInfo('Tidak diketahui', Severity.unknown);
+  if (distanceCm == null) {
+    return const StatusInfo('Tidak diketahui', Severity.unknown);
+  }
   if (distanceCm > SensorThresholds.feedEmptyCm) {
     return const StatusInfo('Kosong', Severity.bad);
   }
@@ -59,7 +61,9 @@ StatusInfo turbidityStatus(num? ntu) {
 
 /// Menentukan status baterai dari persentase daya.
 StatusInfo batteryStatus(int? percent) {
-  if (percent == null) return const StatusInfo('Tidak diketahui', Severity.unknown);
+  if (percent == null) {
+    return const StatusInfo('Tidak diketahui', Severity.unknown);
+  }
   if (percent <= SensorThresholds.batteryLowPercent) {
     return StatusInfo('$percent%', Severity.bad);
   }

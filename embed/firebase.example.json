@@ -1,0 +1,8 @@
+{
+  "FIREBASE_API_KEY": "AIza...",
+  "FIREBASE_APP_ID": "1:1234567890:android:abcdef123456",
+  "FIREBASE_MESSAGING_SENDER_ID": "1234567890",
+  "FIREBASE_PROJECT_ID": "nama-proyek",
+  "FIREBASE_DATABASE_URL": "https://nama-proyek-default-rtdb.asia-southeast1.firebasedatabase.app",
+  "FIREBASE_IOS_BUNDLE_ID": "id.khaichi.fishfeed"
+}
