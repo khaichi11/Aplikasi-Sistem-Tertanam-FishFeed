@@ -1,0 +1,33 @@
+{
+  "rules": {
+    "devices": {
+      ".read": "auth != null",
+      "$deviceId": {
+        "status": { ".write": "auth != null" },
+        "sensors": { ".write": "auth != null" },
+        "info": { ".write": "auth != null" }
+      }
+    },
+    "commands": {
+      "$deviceId": {
+        ".read": "auth != null",
+        ".write": "auth != null"
+      }
+    },
+    "schedules": {
+      "$deviceId": {
+        ".read": "auth != null",
+        ".write": "auth != null"
+      }
+    },
+    "activity": {
+      "$deviceId": {
+        ".read": "auth != null",
+        ".indexOn": ["timestamp"],
+        "$entry": {
+          ".write": "auth != null && !data.exists()"
+        }
+      }
+    }
+  }
+}

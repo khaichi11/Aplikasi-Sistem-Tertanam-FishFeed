@@ -1,18 +1,9 @@
-# Gambar Dokumentasi
+# Gambar dokumentasi
 
-Letakkan tangkapan layar dan gambar pendukung di folder ini. README utama
-sudah menautkan nama berkas berikut, jadi cukup ganti berkasnya tanpa mengubah
-README.
+- `01-*.png` sampai `10-*.png`: tangkapan layar aplikasi, dibuat oleh
+  `embed/integration_test/screenshots_test.dart` di emulator Android.
+- `architecture.png`, `feed-flow.png`, `wiring.png`, `data-structure.png`:
+  diagram, dibuat oleh `tools/make_diagrams.py`.
+- `logo.png`: logo aplikasi, dibuat oleh `embed/tool/generate_icons.py`.
 
-| Nama berkas         | Isi                                              |
-|---------------------|--------------------------------------------------|
-| `login.png`         | Halaman masuk                                     |
-| `dashboard.png`     | Dashboard dengan telemetri perangkat              |
-| `schedule.png`      | Halaman pengaturan jadwal                         |
-| `activity.png`      | Halaman riwayat aktivitas                         |
-| `device-manager.png`| Halaman kelola perangkat                          |
-| `wiring.png`        | Skema rangkaian perangkat keras                   |
-| `device.jpg`        | Foto perangkat terpasang                          |
-
-Format yang disarankan: PNG untuk tangkapan layar, JPG untuk foto. Lebar sekitar
-1080 piksel sudah memadai.
+Jangan sunting gambar secara manual; jalankan ulang skripnya.
