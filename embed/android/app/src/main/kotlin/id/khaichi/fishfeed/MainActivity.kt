@@ -1,4 +1,4 @@
-package com.example.embed
+package id.khaichi.fishfeed
 
 import io.flutter.embedding.android.FlutterActivity
 

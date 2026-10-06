@@ -1,6 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Dibutuhkan untuk terhubung ke Firebase. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
-        android:label="embed"
+        android:label="FishFeed"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
