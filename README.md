@@ -5,8 +5,8 @@
 <h1 align="center">FishFeed</h1>
 
 <p align="center">
-  Pemberi pakan ikan otomatis berbasis ESP32 dengan aplikasi Flutter.<br>
-  <i>An ESP32 automatic fish feeder with a Flutter companion app.</i>
+  Sistem pemberi pakan ikan otomatis berbasis ESP32 dengan aplikasi pendamping Flutter.<br>
+  <i>An ESP32-based automatic fish feeder with a Flutter companion app.</i>
 </p>
 
 <p align="center">
@@ -19,10 +19,10 @@
 
 <table>
   <tr>
-    <td align="center" width="25%"><img src="docs/images/02-dashboard.png" width="180" alt="Dashboard"><br><sub>Dashboard</sub></td>
-    <td align="center" width="25%"><img src="docs/images/04-feed-done.png" width="180" alt="Beri makan"><br><sub>Beri makan / Feed now</sub></td>
-    <td align="center" width="25%"><img src="docs/images/05-schedule.png" width="180" alt="Jadwal"><br><sub>Jadwal / Schedule</sub></td>
-    <td align="center" width="25%"><img src="docs/images/06-activity.png" width="180" alt="Riwayat"><br><sub>Riwayat / History</sub></td>
+    <td align="center" width="25%"><img src="docs/images/framed/02-dashboard.png" width="180" alt="Dashboard"><br><sub>Dashboard</sub></td>
+    <td align="center" width="25%"><img src="docs/images/framed/04-feed-done.png" width="180" alt="Beri makan"><br><sub>Beri makan / Feed now</sub></td>
+    <td align="center" width="25%"><img src="docs/images/framed/05-schedule.png" width="180" alt="Jadwal"><br><sub>Jadwal / Schedule</sub></td>
+    <td align="center" width="25%"><img src="docs/images/framed/06-activity.png" width="180" alt="Riwayat"><br><sub>Riwayat / History</sub></td>
   </tr>
 </table>
 
@@ -32,62 +32,60 @@
 
 ### Tentang
 
-FishFeed terdiri dari dua bagian:
+FishFeed terdiri atas dua bagian yang saling melengkapi. Bagian pertama adalah firmware ESP32 di
+[`Final_Embed/`](Final_Embed) yang membaca sisa pakan, kekeruhan air, dan tegangan baterai, menggerakkan servo
+penjatuh pakan, serta menjalankan jadwal berdasarkan jam RTC. Setiap tugas berjalan sebagai task FreeRTOS, dan
+perangkat memasuki mode deep sleep di antara siklus kerja untuk menghemat daya. Bagian kedua adalah aplikasi Flutter
+di [`embed/`](embed) yang dipakai untuk memantau akuarium, memberi pakan dari jarak jauh, mengatur jadwal, dan
+meninjau riwayat pemberian pakan.
 
-- **Firmware ESP32** ([`Final_Embed/`](Final_Embed)) membaca sisa pakan, kekeruhan
-  air dan baterai, menggerakkan servo pakan, serta menjalankan jadwal dengan jam
-  RTC. Tugas berjalan sebagai task FreeRTOS dan perangkat tidur (deep sleep)
-  di antara siklus untuk menghemat daya.
-- **Aplikasi Flutter** ([`embed/`](embed)) untuk memantau akuarium, memberi
-  pakan dari jauh, mengatur jadwal, dan melihat riwayat.
-
-Aplikasi dan perangkat tidak terhubung langsung. Semua data lewat Firebase,
-jadi keduanya tidak perlu berada di jaringan yang sama.
+Aplikasi dan perangkat tidak pernah berkomunikasi secara langsung. Seluruh data dipertukarkan melalui Firebase,
+sehingga keduanya tidak harus berada di jaringan yang sama.
 
 ![Arsitektur FishFeed](docs/images/architecture.png)
 
 ### Fitur aplikasi
 
-- **Dashboard** dengan cincin indikator sisa pakan, kejernihan air, dan baterai,
-  serta peringatan otomatis: pakan menipis atau habis, air keruh, baterai lemah,
-  dan perangkat offline.
-- **Beri makan sekarang** dengan konfirmasi. Aplikasi menunggu sampai perangkat
-  benar-benar menjatuhkan pakan, lalu menampilkan "Pakan sudah diberikan".
-- **Jadwal otomatis**: tambah waktu (atau pilih Pagi, Siang, Sore), aktifkan
-  atau matikan per waktu, lihat kapan terakhir dijalankan, dan hitung mundur ke
-  pemberian berikutnya.
-- **Riwayat** dikelompokkan per hari dengan filter Manual, Otomatis, dan Jadwal,
-  plus grafik pemberian pakan 7 hari.
-- **Kelola perangkat**: pasangkan dengan ID, ganti nama, lepas, dan pilih
-  perangkat aktif. Satu akun bisa memegang beberapa perangkat.
-- **Mode demo**: tanpa konfigurasi Firebase, aplikasi memakai perangkat simulasi,
-  jadi bisa dicoba langsung tanpa alat dan tanpa kunci API.
+Halaman dashboard menampilkan sisa pakan, kejernihan air, dan kondisi baterai dalam bentuk cincin indikator. Aplikasi
+juga memberikan peringatan otomatis ketika pakan menipis atau habis, air menjadi keruh, baterai melemah, atau perangkat
+sedang tidak terhubung. Ketika pengguna menekan tombol beri makan, aplikasi menunggu hingga perangkat benar-benar
+menjatuhkan pakan sebelum menampilkan konfirmasi bahwa pakan sudah diberikan.
+
+Jadwal otomatis dapat ditambah dengan waktu bebas atau dengan pilihan pagi, siang, dan sore. Setiap waktu dapat
+diaktifkan atau dinonaktifkan secara terpisah, dilengkapi keterangan kapan terakhir dijalankan dan hitung mundur
+menuju pemberian berikutnya. Riwayat dikelompokkan per hari dengan saringan manual, otomatis, dan terjadwal, serta
+dilengkapi grafik pemberian pakan selama tujuh hari terakhir.
+
+Satu akun dapat mengelola beberapa perangkat sekaligus: perangkat dipasangkan melalui ID, dapat diganti namanya,
+dilepas, dan dipilih sebagai perangkat aktif. Apabila konfigurasi Firebase belum tersedia, aplikasi berjalan dalam
+mode demo dengan perangkat simulasi, sehingga dapat dicoba tanpa alat maupun kunci API.
 
 ### Tangkapan layar
 
 <table>
   <tr>
-    <td align="center" width="25%"><img src="docs/images/01-login.png" width="180" alt="Masuk"><br><sub>Masuk</sub></td>
-    <td align="center" width="25%"><img src="docs/images/02-dashboard.png" width="180" alt="Dashboard"><br><sub>Dashboard</sub></td>
-    <td align="center" width="25%"><img src="docs/images/03-dashboard-chart.png" width="180" alt="Grafik"><br><sub>Grafik dan aktivitas</sub></td>
-    <td align="center" width="25%"><img src="docs/images/08-dashboard-alerts.png" width="180" alt="Peringatan"><br><sub>Peringatan</sub></td>
+    <td align="center" width="25%"><img src="docs/images/framed/01-login.png" width="180" alt="Masuk"><br><sub>Masuk</sub></td>
+    <td align="center" width="25%"><img src="docs/images/framed/02-dashboard.png" width="180" alt="Dashboard"><br><sub>Dashboard</sub></td>
+    <td align="center" width="25%"><img src="docs/images/framed/03-dashboard-chart.png" width="180" alt="Grafik"><br><sub>Grafik dan aktivitas</sub></td>
+    <td align="center" width="25%"><img src="docs/images/framed/08-dashboard-alerts.png" width="180" alt="Peringatan"><br><sub>Peringatan</sub></td>
   </tr>
   <tr>
-    <td align="center" width="25%"><img src="docs/images/04-feed-done.png" width="180" alt="Beri makan"><br><sub>Beri makan</sub></td>
-    <td align="center" width="25%"><img src="docs/images/05-schedule.png" width="180" alt="Jadwal"><br><sub>Jadwal</sub></td>
-    <td align="center" width="25%"><img src="docs/images/06-activity.png" width="180" alt="Riwayat"><br><sub>Riwayat</sub></td>
-    <td align="center" width="25%"><img src="docs/images/07-devices.png" width="180" alt="Perangkat"><br><sub>Kelola perangkat</sub></td>
+    <td align="center" width="25%"><img src="docs/images/framed/04-feed-done.png" width="180" alt="Beri makan"><br><sub>Beri makan</sub></td>
+    <td align="center" width="25%"><img src="docs/images/framed/05-schedule.png" width="180" alt="Jadwal"><br><sub>Jadwal</sub></td>
+    <td align="center" width="25%"><img src="docs/images/framed/06-activity.png" width="180" alt="Riwayat"><br><sub>Riwayat</sub></td>
+    <td align="center" width="25%"><img src="docs/images/framed/07-devices.png" width="180" alt="Perangkat"><br><sub>Kelola perangkat</sub></td>
   </tr>
   <tr>
-    <td align="center" width="25%"><img src="docs/images/09-account.png" width="180" alt="Akun"><br><sub>Akun</sub></td>
-    <td align="center" width="25%"><img src="docs/images/10-about.png" width="180" alt="Tentang"><br><sub>Tentang</sub></td>
+    <td align="center" width="25%"><img src="docs/images/framed/09-account.png" width="180" alt="Akun"><br><sub>Akun</sub></td>
+    <td align="center" width="25%"><img src="docs/images/framed/10-about.png" width="180" alt="Tentang"><br><sub>Tentang</sub></td>
     <td width="25%"></td>
     <td width="25%"></td>
   </tr>
 </table>
 
-Semua tangkapan layar dibuat otomatis oleh integration test di emulator Android
-dalam mode demo.
+Seluruh tangkapan layar dibuat secara otomatis oleh integration test di emulator Android dalam mode demo. Bingkai
+ponsel digambar sendiri dengan skrip `phone_frame.py` dari repo [MEIRA](https://github.com/khaichi11/MEIRA)
+(Apache-2.0), tanpa memakai templat perangkat dari pihak lain.
 
 ### Alur pemberian pakan
 
@@ -98,11 +96,11 @@ dalam mode demo.
 | Komponen | Fungsi |
 | --- | --- |
 | ESP32 DevKit V1 | Pengendali utama |
-| RTC DS3231 | Jam untuk jadwal, tetap jalan saat WiFi mati |
+| RTC DS3231 | Penunjuk waktu untuk jadwal, tetap berjalan ketika WiFi terputus |
 | Sensor ultrasonik HC-SR04 | Mengukur jarak ke permukaan pakan |
-| Sensor kekeruhan | Mengukur kekeruhan air (NTU) |
+| Sensor kekeruhan | Mengukur kekeruhan air dalam NTU |
 | Servo | Membuka katup penjatuh pakan |
-| Baterai + pembagi tegangan | Sumber daya dan pembacaan persentase |
+| Baterai dan pembagi tegangan | Sumber daya sekaligus pembacaan persentase baterai |
 
 ![Rangkaian perangkat](docs/images/wiring.png)
 
@@ -111,7 +109,7 @@ dalam mode demo.
 | GPIO 21 | SDA RTC DS3231 |
 | GPIO 22 | SCL RTC DS3231 |
 | GPIO 5 | TRIG sensor ultrasonik |
-| GPIO 18 | ECHO sensor ultrasonik (lewat pembagi tegangan 5 V ke 3,3 V) |
+| GPIO 18 | ECHO sensor ultrasonik, melalui pembagi tegangan 5 V ke 3,3 V |
 | GPIO 34 | Keluaran analog sensor kekeruhan |
 | GPIO 32 | Pembagi tegangan baterai |
 | GPIO 13 | Sinyal servo |
@@ -120,107 +118,102 @@ dalam mode demo.
 
 ![Struktur data Firebase](docs/images/data-structure.png)
 
-Firmware dan aplikasi memakai format yang sama. Bila salah satu diubah, ubah
-juga yang lain.
+Firmware dan aplikasi memakai format data yang sama. Oleh karena itu, setiap perubahan pada salah satunya perlu
+diikuti perubahan yang sesuai pada yang lain.
 
 ### Menjalankan aplikasi
 
-Diperlukan Flutter 3.41 dan Android SDK.
+Aplikasi memerlukan Flutter 3.41 dan Android SDK. Tanpa konfigurasi tambahan, aplikasi berjalan dalam mode demo.
 
 ```bash
 cd embed
 flutter pub get
-flutter run            # mode demo, tanpa Firebase
+flutter run
 ```
 
-Masuk dengan tombol **Coba dengan akun demo**, atau email apa saja. Di halaman
-Kelola perangkat, coba pasangkan `FF-2025`.
+Untuk masuk, gunakan tombol **Coba dengan akun demo** atau alamat email apa pun. Pada halaman Kelola perangkat,
+perangkat simulasi dapat dipasangkan dengan ID `FF-2025`.
 
-#### Mode Firebase (alat sungguhan)
+#### Mode Firebase dengan alat sungguhan
 
-1. Buat proyek di [Firebase Console](https://console.firebase.google.com),
-   aktifkan **Authentication** (Email/Password), **Realtime Database**, dan
-   **Cloud Firestore**.
-2. Pasang aturan keamanan dari
-   [`docs/firebase/database.rules.json`](docs/firebase/database.rules.json) dan
+1. Buat proyek di [Firebase Console](https://console.firebase.google.com), lalu aktifkan **Authentication**
+   (Email/Password), **Realtime Database**, dan **Cloud Firestore**.
+2. Pasang aturan keamanan dari [`docs/firebase/database.rules.json`](docs/firebase/database.rules.json) dan
    [`docs/firebase/firestore.rules`](docs/firebase/firestore.rules).
-3. Daftarkan aplikasi Android, lalu salin `embed/firebase.example.json` menjadi
-   `embed/firebase.json` dan isi nilainya. Berkas ini tidak pernah di-commit.
-4. Jalankan:
+3. Daftarkan aplikasi Android, salin `embed/firebase.example.json` menjadi `embed/firebase.json`, kemudian isi
+   nilainya. Berkas ini tidak pernah dimasukkan ke repositori.
+4. Jalankan atau bangun aplikasi dengan konfigurasi tersebut:
 
 ```bash
 flutter run --dart-define-from-file=firebase.json
 flutter build apk --release --dart-define-from-file=firebase.json
 ```
 
-Tidak perlu `google-services.json`; konfigurasi dibaca saat build. Bila
-konfigurasi tidak lengkap, aplikasi otomatis memakai mode demo.
+Berkas `google-services.json` tidak diperlukan karena konfigurasi dibaca saat proses build. Apabila konfigurasi tidak
+lengkap, aplikasi kembali ke mode demo secara otomatis.
 
 ### Mengunggah firmware
 
-Diperlukan Arduino IDE atau `arduino-cli` dengan papan **ESP32** dan pustaka
-**Firebase Arduino Client Library for ESP8266 and ESP32**, **ESP32Servo**, dan
-**RTClib**.
+Pengunggahan memerlukan Arduino IDE atau `arduino-cli` dengan paket papan **ESP32** serta pustaka **Firebase Arduino
+Client Library for ESP8266 and ESP32**, **ESP32Servo**, dan **RTClib**.
 
 1. Salin `Final_Embed/config.example.h` menjadi `Final_Embed/config.h`.
-2. Isi WiFi, kunci Firebase, akun perangkat (buat satu pengguna Email/Password
-   khusus alat di Firebase Authentication), dan `DEVICE_ID`.
-3. Buka `Final_Embed/Final_Embed.ino`, pilih papan **ESP32 Dev Module**, lalu
-   unggah.
-4. Agar bisa dipasangkan di aplikasi, buat `devices/{DEVICE_ID}/info/name` di
-   Realtime Database (misalnya "Akuarium Ruang Tamu").
+2. Isi data WiFi, kunci Firebase, akun perangkat, dan `DEVICE_ID`. Akun perangkat sebaiknya berupa pengguna
+   Email/Password tersendiri di Firebase Authentication.
+3. Buka `Final_Embed/Final_Embed.ino`, pilih papan **ESP32 Dev Module**, lalu unggah.
+4. Buat `devices/{DEVICE_ID}/info/name` di Realtime Database, misalnya "Akuarium Ruang Tamu", agar perangkat dapat
+   dipasangkan di aplikasi.
 
-`config.h` berisi kredensial dan diabaikan oleh Git.
+Berkas `config.h` berisi kredensial sehingga diabaikan oleh Git. Firmware menggunakan sekitar 96% ruang program pada
+skema partisi bawaan karena ukuran pustaka Firebase cukup besar. Apabila ruang tidak mencukupi setelah fitur
+ditambahkan, pilih **Tools > Partition Scheme > Huge APP (3MB No OTA)**.
 
-Firmware memakai sekitar 96% ruang program pada skema partisi bawaan, karena
-pustaka Firebase cukup besar. Bila menambah fitur dan ruang tidak cukup, pilih
-**Tools > Partition Scheme > Huge APP (3MB No OTA)**.
-
-Cara kerja satu siklus: perangkat bangun, membaca sensor, terhubung ke WiFi dan
-Firebase, mengirim data, mengecek perintah dan jadwal selama 5 detik, lalu
-tidur 5 detik. Bila WiFi atau Firebase tidak tersedia, perangkat tidur 30 detik
-dan mencoba lagi, tanpa macet. RTC disinkronkan dengan NTP saat pertama
-menyala dan kira-kira setiap 2 jam.
+Dalam satu siklus, perangkat bangun dari mode tidur, membaca sensor, terhubung ke WiFi dan Firebase, lalu mengirim
+data. Setelah itu perangkat memeriksa perintah dan jadwal selama lima detik sebelum kembali tidur selama lima detik.
+Apabila WiFi atau Firebase tidak tersedia, perangkat tidur selama tiga puluh detik lalu mencoba kembali, sehingga
+tidak pernah macet. Jam RTC disinkronkan melalui NTP ketika perangkat pertama kali menyala dan kemudian kira-kira
+setiap dua jam.
 
 ### Pengujian
 
 ```bash
 cd embed
 flutter analyze
-flutter test           # logika, data demo, dan alur layar
+flutter test
 flutter drive --driver=test_driver/integration_test.dart \
-  --target=integration_test/screenshots_test.dart   # di emulator, membuat tangkapan layar
+  --target=integration_test/screenshots_test.dart
 ```
 
-CI GitHub Actions menjalankan analisis dan tes aplikasi, membangun APK, dan
+`flutter analyze` memeriksa kode secara statis, sedangkan `flutter test` menguji logika status sensor, peringatan,
+jadwal, data demo, dan alur antarhalaman. Integration test menjalankan aplikasi di emulator sekaligus menghasilkan
+tangkapan layar. Alur CI di GitHub Actions menjalankan analisis dan pengujian aplikasi, membangun APK, serta
 mengompilasi firmware untuk ESP32.
 
 ### Struktur repositori
 
 ```
-Final_Embed/          Firmware ESP32 (Arduino + FreeRTOS)
-embed/                Aplikasi Flutter
-  lib/data/           Backend Firebase dan mode demo
-  lib/logic/          Status sensor, peringatan, jadwal, statistik
-  lib/models/         Model data sesuai kontrak firmware
-  lib/ui/             Halaman, tema, dan widget
-  tool/               Pembuat ikon aplikasi
-docs/images/          Tangkapan layar dan diagram
-docs/firebase/        Aturan keamanan Firebase
-tools/                Pembuat diagram dokumentasi
+Final_Embed/          firmware ESP32 (Arduino dan FreeRTOS)
+embed/                aplikasi Flutter
+  lib/data/           backend Firebase dan mode demo
+  lib/logic/          status sensor, peringatan, jadwal, dan statistik
+  lib/models/         model data sesuai kontrak firmware
+  lib/ui/             halaman, tema, dan widget
+  tool/               pembuat ikon aplikasi
+docs/images/          tangkapan layar dan diagram
+docs/firebase/        aturan keamanan Firebase
+tools/                pembuat diagram dokumentasi
 ```
 
 ### Keamanan
 
-Kredensial WiFi dan Firebase tidak pernah disimpan di repositori. Riwayat Git
-sudah dibersihkan dari kata sandi yang sempat ter-commit. Bila kata sandi WiFi
-atau akun perangkat lama masih dipakai, sebaiknya diganti.
+Kredensial WiFi dan Firebase tidak pernah disimpan di repositori, dan riwayat Git telah dibersihkan dari kata sandi
+yang sempat masuk. Apabila kata sandi WiFi atau akun perangkat lama masih digunakan, sebaiknya kata sandi tersebut
+diganti.
 
 ### Lisensi aset
 
-Logo, ikon, diagram, dan tangkapan layar dibuat khusus untuk proyek ini. Font
-Poppins dan Inter memakai SIL Open Font License. Ikon antarmuka berasal dari
-Material Icons (Apache 2.0).
+Logo, ikon, diagram, dan tangkapan layar dibuat khusus untuk proyek ini. Huruf Poppins dan Inter memakai SIL Open
+Font License, sedangkan ikon antarmuka berasal dari Material Icons (Apache 2.0).
 
 ---
 
@@ -228,34 +221,47 @@ Material Icons (Apache 2.0).
 
 ### About
 
-FishFeed has two parts:
+FishFeed consists of two complementary parts. The first is the ESP32 firmware in [`Final_Embed/`](Final_Embed), which
+reads the remaining feed, water turbidity, and battery voltage, drives the feeding servo, and runs schedules based on
+an RTC clock. Each job runs as a FreeRTOS task, and the board enters deep sleep between cycles to save power. The
+second is the Flutter app in [`embed/`](embed), which is used to monitor the aquarium, feed the fish remotely, manage
+schedules, and review the feeding history.
 
-- **ESP32 firmware** ([`Final_Embed/`](Final_Embed)) reads the feed level, water
-  turbidity and battery, drives the feeding servo and runs schedules with an RTC
-  clock. Work runs as FreeRTOS tasks, and the board deep-sleeps between cycles to
-  save power.
-- **Flutter app** ([`embed/`](embed)) to monitor the aquarium, feed remotely,
-  manage schedules and review history.
+The app and the device never communicate directly. All data passes through Firebase, so the two do not need to be on
+the same network.
 
-The app and the device never talk directly. All data goes through Firebase, so
-they do not need to share a network. See the architecture, feed flow, wiring
-and data structure diagrams in the Indonesian section above.
+![FishFeed architecture](docs/images/architecture.png)
 
 ### App features
 
-- **Dashboard** with ring gauges for feed level, water clarity and battery, and
-  automatic warnings for low or empty feed, cloudy water, low battery and an
-  offline device.
-- **Feed now** with confirmation. The app waits until the device has actually
-  dropped the food and then shows "Pakan sudah diberikan".
-- **Automatic schedule**: add times (or Morning, Noon, Evening presets), toggle
-  each time, see when it last ran and a countdown to the next feeding.
-- **History** grouped by day with Manual, Automatic and Schedule filters, plus a
-  7-day feeding chart.
-- **Device management**: pair by ID, rename, unpair and switch devices. One
-  account can hold several devices.
-- **Demo mode**: without Firebase configuration the app uses a simulated device,
-  so it runs straight away without hardware or API keys.
+The dashboard shows the remaining feed, water clarity, and battery level as ring gauges. The app also raises automatic
+warnings when the feed is low or empty, the water becomes cloudy, the battery runs low, or the device goes offline.
+When the user taps the feed button, the app waits until the device has actually dropped the food before confirming
+that the fish have been fed.
+
+Feeding times can be added freely or chosen from morning, noon, and evening presets. Each time can be switched on or
+off on its own and shows when it last ran, together with a countdown to the next feeding. The history is grouped by
+day with manual, automatic, and scheduled filters, and includes a chart of the last seven days.
+
+One account can manage several devices: a device is paired by its ID and can be renamed, unpaired, or selected as the
+active device. When no Firebase configuration is available, the app runs in demo mode with a simulated device, so it
+can be tried without hardware or API keys.
+
+### Screenshots
+
+<table>
+  <tr>
+    <td align="center" width="25%"><img src="docs/images/framed/01-login.png" width="180" alt="Sign in"><br><sub>Sign in</sub></td>
+    <td align="center" width="25%"><img src="docs/images/framed/03-dashboard-chart.png" width="180" alt="Chart"><br><sub>Chart and activity</sub></td>
+    <td align="center" width="25%"><img src="docs/images/framed/08-dashboard-alerts.png" width="180" alt="Alerts"><br><sub>Alerts</sub></td>
+    <td align="center" width="25%"><img src="docs/images/framed/07-devices.png" width="180" alt="Devices"><br><sub>Devices</sub></td>
+  </tr>
+</table>
+
+The screenshots are produced automatically by the integration test on an Android emulator in demo mode. The phone
+frames are drawn with the `phone_frame.py` script from the [MEIRA](https://github.com/khaichi11/MEIRA) repository
+(Apache-2.0); no third-party device mockups are used. The feeding flow, wiring, pin table, and Firebase data structure
+are shown in the Indonesian section above.
 
 ### Running the app
 
@@ -266,43 +272,36 @@ flutter run                                         # demo mode
 flutter run --dart-define-from-file=firebase.json   # real Firebase
 ```
 
-For Firebase mode, enable Email/Password Authentication, Realtime Database and
-Cloud Firestore, apply the rules in [`docs/firebase/`](docs/firebase), and copy
-`embed/firebase.example.json` to `embed/firebase.json` with your values. No
-`google-services.json` is needed, and `firebase.json` is never committed.
+For Firebase mode, enable Email/Password Authentication, the Realtime Database, and Cloud Firestore, apply the rules
+in [`docs/firebase/`](docs/firebase), and copy `embed/firebase.example.json` to `embed/firebase.json` with your own
+values. No `google-services.json` is needed, and `firebase.json` is never committed.
 
 ### Flashing the firmware
 
-Install the ESP32 board package and the **Firebase Arduino Client Library for
-ESP8266 and ESP32**, **ESP32Servo** and **RTClib** libraries. Copy
-`Final_Embed/config.example.h` to `Final_Embed/config.h`, fill in WiFi, Firebase
-keys, a dedicated device user and `DEVICE_ID`, then upload
-`Final_Embed/Final_Embed.ino` to an **ESP32 Dev Module**. Create
-`devices/{DEVICE_ID}/info/name` in the Realtime Database so the device can be
-paired in the app. The firmware uses about 96% of program space with the
-default partition scheme; if you add features, pick **Huge APP (3MB No OTA)**.
+Install the ESP32 board package together with the **Firebase Arduino Client Library for ESP8266 and ESP32**,
+**ESP32Servo**, and **RTClib** libraries. Copy `Final_Embed/config.example.h` to `Final_Embed/config.h`, fill in the
+WiFi details, Firebase keys, a dedicated device user, and `DEVICE_ID`, and then upload `Final_Embed/Final_Embed.ino`
+to an **ESP32 Dev Module**. Create `devices/{DEVICE_ID}/info/name` in the Realtime Database so that the device can be
+paired in the app. The firmware uses about 96% of the program space with the default partition scheme; if more
+features are added, select **Huge APP (3MB No OTA)**.
 
-Each cycle the device wakes up, reads its sensors, connects to WiFi and
-Firebase, sends data, checks commands and schedules for 5 seconds and sleeps
-for 5 seconds. Without WiFi or Firebase it sleeps for 30 seconds and retries
-instead of hanging. The RTC is synced over NTP on first boot and about every
-two hours.
+In each cycle the device wakes up, reads its sensors, connects to WiFi and Firebase, and sends its data. It then
+checks for commands and schedules for five seconds before sleeping for another five. Without WiFi or Firebase it
+sleeps for thirty seconds and tries again, so it never hangs. The RTC is synchronised over NTP on first boot and about
+every two hours afterwards.
 
 ### Testing
 
-`flutter analyze` and `flutter test` cover the logic, the demo backend and the
-screen flows. The integration test drives the app on an emulator and saves the
-screenshots. GitHub Actions runs the app checks, builds an APK and compiles the
-firmware for ESP32.
+`flutter analyze` checks the code statically, and `flutter test` covers the sensor status logic, warnings, schedules,
+the demo backend, and the screen flows. The integration test drives the app on an emulator and saves the screenshots.
+GitHub Actions runs the app checks, builds an APK, and compiles the firmware for ESP32.
 
 ### Security
 
-WiFi and Firebase credentials are never stored in the repository, and the Git
-history has been cleaned of passwords that were once committed. If the old WiFi
-or device passwords are still in use, change them.
+WiFi and Firebase credentials are never stored in the repository, and the Git history has been cleaned of passwords
+that were committed earlier. If the old WiFi or device passwords are still in use, they should be changed.
 
 ### Asset licenses
 
-The logo, icons, diagrams and screenshots were made for this project. Poppins
-and Inter use the SIL Open Font License. UI icons come from Material Icons
-(Apache 2.0).
+The logo, icons, diagrams, and screenshots were created for this project. The Poppins and Inter fonts use the SIL Open
+Font License, and the interface icons come from Material Icons (Apache 2.0).
