@@ -6,8 +6,7 @@ import 'state/device_controller.dart';
 import 'ui/pages/home_shell.dart';
 import 'ui/pages/login_page.dart';
 import 'ui/theme/app_theme.dart';
-import 'ui/widgets/feeding_loader.dart';
-import 'ui/widgets/opening_intro.dart';
+import 'ui/widgets/aquarium_intro.dart';
 
 class FishFeedApp extends StatefulWidget {
   const FishFeedApp({
@@ -48,17 +47,7 @@ class _FishFeedAppState extends State<FishFeedApp> {
           child:
               _introDone
                   ? const AuthGate()
-                  : OpeningIntro(
-                    appName: 'FishFeed',
-                    tagline: 'Pemberi pakan ikan otomatis',
-                    mark: const FeedingLoader(),
-                    hint: 'Ketuk akuarium untuk menabur pakan',
-                    colors: const [AppColors.teal, AppColors.oceanDeep],
-                    paper: AppColors.background,
-                    accent: AppColors.ocean,
-                    ink: AppColors.ink,
-                    displayFont: 'Poppins',
-                    bodyFont: 'Inter',
+                  : AquariumIntro(
                     onDone: () => setState(() => _introDone = true),
                   ),
         ),

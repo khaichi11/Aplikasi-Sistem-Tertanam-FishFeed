@@ -7,7 +7,6 @@ import 'dart:io';
 
 import 'package:fishfeed/app.dart';
 import 'package:fishfeed/data/demo_backend.dart';
-import 'package:fishfeed/ui/widgets/feeding_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -25,31 +24,22 @@ void main() {
           ],
       }),
     );
-    tester.view.physicalSize = const Size(1080, 2340);
-    tester.view.devicePixelRatio = 3;
-    addTearDown(tester.view.reset);
     if (out != null) Directory(out).createSync(recursive: true);
     final now = DateTime(2026, 6, 10, 9, 30);
     final demo = DemoBackend(tickInterval: null, clock: () => now);
     addTearDown(demo.dispose);
-    final r = DemoRecorder(tester, out);
+    final r = DemoRecorder(tester, out)..prepare();
     await tester.pumpWidget(
       r.wrap(FishFeedApp(backend: demo, clock: () => now)),
     );
 
-    // 1. pembuka: ikan mendekati pakan yang jatuh dan pakan yang ditabur
+    // 1. pembuka: air naik memenuhi layar, ikan mendekati pakan yang jatuh dan pakan yang ditabur
     r.scene = 'pembuka';
-    await r.run(3800);
-    final tank = tester.getRect(find.byType(FeedingLoader));
-    await r.tapAt(
-      tank.topLeft + Offset(tank.width * .78, tank.height * .3),
-      after: 1300,
-    );
-    await r.tapAt(
-      tank.topLeft + Offset(tank.width * .25, tank.height * .35),
-      after: 2400,
-    );
-    await r.run(2400);
+    await r.run(3400);
+    final screen = tester.getRect(find.byType(FishFeedApp));
+    await r.tapAt(Offset(screen.width * .78, screen.height * .42), after: 1300);
+    await r.tapAt(Offset(screen.width * .24, screen.height * .5), after: 2400);
+    await r.run(3200);
 
     // 2. masuk dengan akun demo
     r.scene = 'masuk';

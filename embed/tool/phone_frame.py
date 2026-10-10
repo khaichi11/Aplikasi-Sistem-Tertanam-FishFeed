@@ -45,6 +45,68 @@ def clear_corners(im: Image.Image) -> Image.Image:
     return out
 
 
+def _font(size: int):
+    """Inter dari assets/fonts proyek ini bila ada; huruf bawaan Pillow bila tidak."""
+    from PIL import ImageFont
+
+    fonts = Path(__file__).resolve().parent.parent / "assets" / "fonts"
+    for name in ("Inter-SemiBold.ttf", "Inter.ttf", "Inter-Medium.ttf"):
+        if (fonts / name).exists():
+            font = ImageFont.truetype(str(fonts / name), size)
+            try:
+                font.set_variation_by_axes([600])  # Inter variabel: tebal setengah
+            except Exception:
+                pass
+            return font
+    return ImageFont.load_default()
+
+
+def system_bars(im: Image.Image, top: int, bottom: int, clock: str = "09.30") -> Image.Image:
+    """Gambar bilah status (jam, sinyal, WiFi, baterai) di [top] piksel teratas dan garis gestur di [bottom] piksel
+    terbawah, untuk layar yang dirender dengan ruang sistem kosong. Warna ikon putih di atas latar gelap dan abu-abu
+    tua di atas latar terang, seperti di ponsel sungguhan."""
+    w, h = im.size
+    out = im.convert("RGB").copy()
+    k = 4  # supersampling
+    for y0, y1, kind in ((0, top, "status"), (h - bottom, h, "gesture")):
+        if y1 - y0 <= 0:
+            continue
+        strip = out.crop((0, y0, w, y1))
+        lum = sum(ImageStat.Stat(strip.convert("L")).mean)
+        ink = (255, 255, 255) if lum < 150 else (38, 44, 54)
+        big = strip.resize((w * k, (y1 - y0) * k), Image.NEAREST)
+        d = ImageDraw.Draw(big)
+        bh = (y1 - y0) * k
+        if kind == "gesture":
+            pw, ph = w * k * .3, max(2 * k, bh * .16)
+            d.rounded_rectangle(((w * k - pw) / 2, bh * .55 - ph / 2, (w * k + pw) / 2, bh * .55 + ph / 2), radius=ph / 2, fill=ink)
+        else:
+            cy, size = bh * .55, bh * .42
+            font = _font(round(size * 1.3))
+            d.text((w * k * .085, cy), clock, font=font, fill=ink, anchor="lm")
+            x = w * k * (1 - .085)
+            # baterai: badan, isi, dan tonjolan kecil di kanan
+            bw_, bht = size * 1.9, size * .95
+            d.rounded_rectangle((x - bw_, cy - bht / 2, x, cy + bht / 2), radius=bht * .28, outline=ink, width=max(1, round(k * .9)))
+            d.rounded_rectangle((x + k * .6, cy - bht * .22, x + k * 3, cy + bht * .22), radius=k * .6, fill=ink)
+            pad = k * 1.4
+            d.rounded_rectangle((x - bw_ + pad, cy - bht / 2 + pad, x - bw_ + pad + (bw_ - 2 * pad) * .8, cy + bht / 2 - pad), radius=bht * .15, fill=ink)
+            x -= bw_ + size * .55
+            # WiFi: kipas tiga busur dengan pusat yang sama
+            wx, wy = x - size * .55, cy + size * .5
+            for r in (size * 1.0, size * .66):
+                d.arc((wx - r, wy - r, wx + r, wy + r), 225, 315, fill=ink, width=max(1, round(size * .14)))
+            r = size * .34
+            d.pieslice((wx - r, wy - r, wx + r, wy + r), 225, 315, fill=ink)
+            x -= size * 1.5
+            # sinyal: empat batang naik
+            for i in range(4):
+                bx = x + i * size * .32
+                d.rounded_rectangle((bx, cy + size * .45 - size * (.3 + .23 * i), bx + size * .2, cy + size * .45), radius=k * .4, fill=ink)
+        out.paste(big.resize((w, y1 - y0), Image.LANCZOS), (0, y0))
+    return out
+
+
 def layout(w: int, h: int) -> dict:
     """Ukuran bingkai untuk layar berukuran w x h piksel."""
     bez = round(w * 0.04)

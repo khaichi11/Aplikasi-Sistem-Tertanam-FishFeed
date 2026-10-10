@@ -18,7 +18,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/images/demo.gif" width="300" alt="Demo FishFeed: pembuka akuarium dengan ikan yang mendekati pakan, masuk dengan akun demo, dashboard, beri makan sekarang, jadwal, dan riwayat">
+  <img src="docs/images/demo.gif" width="300" alt="Demo FishFeed: pembuka akuarium selayar dengan ikan yang mendekati pakan, masuk dengan akun demo, dashboard, beri makan sekarang, jadwal, dan riwayat">
 </p>
 
 <table>
@@ -64,9 +64,11 @@ Satu akun dapat mengelola beberapa perangkat sekaligus: perangkat dipasangkan me
 dilepas, dan dipilih sebagai perangkat aktif. Apabila konfigurasi Firebase belum tersedia, aplikasi berjalan dalam
 mode demo dengan perangkat simulasi, sehingga dapat dicoba tanpa alat maupun kunci API.
 
-Saat dibuka, aplikasi menyapa dengan "Halo!", lalu menampilkan akuarium kecil berisi seekor ikan. Butiran pakan jatuh
-dari atas seperti saat alat bekerja, dan ikan berbalik mendekat untuk memakannya. Pengguna dapat mengetuk akuarium
-untuk menabur pakan di titik yang diketuk.
+Saat dibuka, panel air naik dari bawah sampai seluruh layar menjadi akuarium, lalu sapaan "Halo!" mengapung di
+permukaannya. Tiga ikan berenang, butiran pakan sesekali jatuh seperti saat alat bekerja, dan ikan berbalik mendekat
+untuk memakannya. Pengguna dapat mengetuk di mana saja untuk menabur pakan, dan pembuka menunggu selama pengguna masih
+memberi makan sebelum memudar ke aplikasi. Bila Firebase belum diatur, halaman masuk cukup menampilkan keterangan
+singkat "Mode demo" di bawah tombol akun demo, bukan kotak peringatan.
 
 Status pakan memakai ambang yang sama dengan persentase pada cincin indikator: jarak sensor 5 cm atau lebih berarti
 kosong (0%), di atas 3 cm berarti menipis, dan selebihnya cukup. Bila wadah terbaca kosong, aplikasi mengingatkan
@@ -268,9 +270,11 @@ One account can manage several devices: a device is paired by its ID and can be 
 active device. When no Firebase configuration is available, the app runs in demo mode with a simulated device, so it
 can be tried without hardware or API keys.
 
-On launch the app greets the user with "Halo!" and then shows a small aquarium with a fish. Food pellets drop from the
-top as they do when the device runs, and the fish turns and swims over to eat them. Tapping the aquarium scatters food
-at that spot.
+On launch a panel of water rises from the bottom until the whole screen becomes an aquarium, and the greeting "Halo!"
+floats near the surface. Three fish swim about, food pellets drop now and then as they do when the device runs, and the
+fish turn and swim over to eat them. Tapping anywhere scatters food, and the opening waits while the user keeps
+feeding before it fades into the app. When Firebase is not configured, the sign-in page shows a short "Mode demo" note
+under the demo account button instead of a warning box.
 
 The feed status uses the same thresholds as the percentage on the ring gauge: a sensor distance of 5 cm or more means
 empty (0%), more than 3 cm means low, and anything closer means enough. When the hopper reads empty, the app warns the

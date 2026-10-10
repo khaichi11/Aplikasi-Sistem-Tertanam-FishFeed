@@ -45,6 +45,18 @@ class DemoRecorder {
   var _frame = 0;
   String scene = '';
 
+  /// Ukuran layar ponsel 360 x 780 dp dengan ruang bilah status (24 dp) dan garis gestur (16 dp), seperti ponsel
+  /// sungguhan, supaya bilah aplikasi ikut mewarnai area bilah status. Bayangan digambar sungguhan; pengujian Flutter
+  /// biasanya menggantinya dengan garis hitam.
+  void prepare() {
+    tester.view.physicalSize = const Size(1080, 2340);
+    tester.view.devicePixelRatio = 3;
+    tester.view.padding = const FakeViewPadding(top: 72, bottom: 48);
+    tester.view.viewPadding = const FakeViewPadding(top: 72, bottom: 48);
+    debugDisableShadows = false;
+    addTearDown(tester.view.reset);
+  }
+
   /// Bungkus aplikasi supaya bisa direkam dan ketukannya terlihat.
   Widget wrap(Widget app) => RepaintBoundary(
     key: key,
@@ -143,6 +155,7 @@ class DemoRecorder {
   }
 
   void finish() {
+    debugDisableShadows = true;
     final dir = out;
     if (dir != null) {
       File('$dir/manifest.json').writeAsStringSync(jsonEncode(_manifest));

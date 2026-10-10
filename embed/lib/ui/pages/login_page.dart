@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import '../../data/demo_backend.dart';
 import '../../data/feeder_backend.dart';
 import '../theme/app_theme.dart';
-import '../widgets/common.dart';
 import '../widgets/logo.dart';
 import 'signup_page.dart';
 
@@ -77,19 +76,6 @@ class _LoginPageState extends State<LoginPage> {
                         color: AppColors.muted,
                       ),
                     ),
-                    if (demo) ...[
-                      const SizedBox(height: Gap.lg),
-                      const NoticeBox(
-                        icon: Icons.science_outlined,
-                        title: 'Mode demo',
-                        text:
-                            'Firebase belum dikonfigurasi, jadi aplikasi memakai '
-                            'perangkat simulasi. Masuk dengan akun demo atau email '
-                            'apa saja.',
-                        color: AppColors.coralSoft,
-                        iconColor: AppColors.coral,
-                      ),
-                    ],
                     const SizedBox(height: Gap.xl),
                     TextFormField(
                       controller: _email,
@@ -162,6 +148,34 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
                         icon: const Icon(Icons.play_circle_outline_rounded),
                         label: const Text('Coba dengan akun demo'),
+                      ),
+                      const SizedBox(height: Gap.sm),
+                      // keterangan singkat, bukan kotak peringatan: versi tanpa Firebase memang dimaksudkan untuk dicoba
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.science_outlined,
+                            size: 16,
+                            color: AppColors.muted,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            'Mode demo',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: AppColors.muted,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          Flexible(
+                            child: Text(
+                              ' dengan perangkat simulasi',
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: AppColors.muted,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                     const SizedBox(height: Gap.lg),
