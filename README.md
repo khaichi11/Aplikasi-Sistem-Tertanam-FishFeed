@@ -17,6 +17,10 @@
   <a href="#bahasa-indonesia">Bahasa Indonesia</a> · <a href="#english">English</a>
 </p>
 
+<p align="center">
+  <img src="docs/images/demo.gif" width="300" alt="Demo FishFeed: pembuka akuarium dengan ikan yang mendekati pakan, masuk dengan akun demo, dashboard, beri makan sekarang, jadwal, dan riwayat">
+</p>
+
 <table>
   <tr>
     <td align="center" width="25%"><img src="docs/images/framed/02-dashboard.png" width="180" alt="Dashboard"><br><sub>Dashboard</sub></td>
@@ -59,6 +63,14 @@ dilengkapi grafik pemberian pakan selama tujuh hari terakhir.
 Satu akun dapat mengelola beberapa perangkat sekaligus: perangkat dipasangkan melalui ID, dapat diganti namanya,
 dilepas, dan dipilih sebagai perangkat aktif. Apabila konfigurasi Firebase belum tersedia, aplikasi berjalan dalam
 mode demo dengan perangkat simulasi, sehingga dapat dicoba tanpa alat maupun kunci API.
+
+Saat dibuka, aplikasi menyapa dengan "Halo!", lalu menampilkan akuarium kecil berisi seekor ikan. Butiran pakan jatuh
+dari atas seperti saat alat bekerja, dan ikan berbalik mendekat untuk memakannya. Pengguna dapat mengetuk akuarium
+untuk menabur pakan di titik yang diketuk.
+
+Status pakan memakai ambang yang sama dengan persentase pada cincin indikator: jarak sensor 5 cm atau lebih berarti
+kosong (0%), di atas 3 cm berarti menipis, dan selebihnya cukup. Bila wadah terbaca kosong, aplikasi mengingatkan
+sebelum perintah beri makan dikirim.
 
 ### Tangkapan layar
 
@@ -189,6 +201,15 @@ jadwal, data demo, dan alur antarhalaman. Integration test menjalankan aplikasi 
 tangkapan layar. Alur CI di GitHub Actions menjalankan analisis dan pengujian aplikasi, membangun APK, serta
 mengompilasi firmware untuk ESP32.
 
+GIF demo di bagian atas dirender di laptop tanpa emulator: `demo_render_test.dart` menggambar setiap layar dengan
+backend demo dan menyimpan bingkainya, lalu `tool/render_gif.py` menyusunnya ke dalam bingkai ponsel.
+
+```bash
+cd embed
+DEMO_FRAMES=build/frames flutter test test/demo_render_test.dart
+python3 tool/render_gif.py build/frames ../docs/images/demo.gif
+```
+
 ### Struktur repositori
 
 ```
@@ -247,6 +268,14 @@ One account can manage several devices: a device is paired by its ID and can be 
 active device. When no Firebase configuration is available, the app runs in demo mode with a simulated device, so it
 can be tried without hardware or API keys.
 
+On launch the app greets the user with "Halo!" and then shows a small aquarium with a fish. Food pellets drop from the
+top as they do when the device runs, and the fish turns and swims over to eat them. Tapping the aquarium scatters food
+at that spot.
+
+The feed status uses the same thresholds as the percentage on the ring gauge: a sensor distance of 5 cm or more means
+empty (0%), more than 3 cm means low, and anything closer means enough. When the hopper reads empty, the app warns the
+user before the feed command is sent.
+
 ### Screenshots
 
 <table>
@@ -295,6 +324,15 @@ every two hours afterwards.
 `flutter analyze` checks the code statically, and `flutter test` covers the sensor status logic, warnings, schedules,
 the demo backend, and the screen flows. The integration test drives the app on an emulator and saves the screenshots.
 GitHub Actions runs the app checks, builds an APK, and compiles the firmware for ESP32.
+
+The demo GIF at the top is rendered on a laptop without an emulator: `demo_render_test.dart` draws every screen with
+the demo backend and saves the frames, and `tool/render_gif.py` then places them in a phone frame.
+
+```bash
+cd embed
+DEMO_FRAMES=build/frames flutter test test/demo_render_test.dart
+python3 tool/render_gif.py build/frames ../docs/images/demo.gif
+```
 
 ### Security
 

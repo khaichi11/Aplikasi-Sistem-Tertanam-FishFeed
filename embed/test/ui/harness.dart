@@ -18,7 +18,9 @@ Future<DemoBackend> pumpApp(WidgetTester tester, {DemoBackend? backend}) async {
   addTearDown(tester.view.reset);
   addTearDown(tester.platformDispatcher.clearAccessibilityFeaturesTestValue);
   addTearDown(demo.dispose);
-  await tester.pumpWidget(FishFeedApp(backend: demo, clock: () => testNow));
+  await tester.pumpWidget(
+    FishFeedApp(backend: demo, clock: () => testNow, intro: false),
+  );
   await tester.pump();
   return demo;
 }

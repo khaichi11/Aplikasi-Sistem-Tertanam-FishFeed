@@ -62,3 +62,6 @@ local.properties
 
 # Konfigurasi Firebase pribadi. Salin dari firebase.example.json.
 firebase.json
+
+# Python
+__pycache__/

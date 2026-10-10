@@ -37,7 +37,7 @@ void main() {
       ),
     );
 
-    await tester.pumpWidget(FishFeedApp(backend: demo));
+    await tester.pumpWidget(FishFeedApp(backend: demo, intro: false));
     await shoot('01-login');
 
     await tap(find.text('Coba dengan akun demo'));
