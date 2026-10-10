@@ -28,6 +28,9 @@ class SensorThresholds {
   static const double feedEmptyCm = 5.0;
   static const double feedHalfCm = 3.0;
 
+  /// Jarak saat wadah penuh; dipakai juga untuk persentase isi di dasbor.
+  static const double feedFullCm = 1.0;
+
   /// Kekeruhan air dalam NTU; di atas nilai ini air dianggap keruh.
   static const double turbidityCloudyNtu = 50.0;
 
@@ -36,18 +39,20 @@ class SensorThresholds {
   static const int batteryMediumPercent = 50;
 }
 
-/// Menentukan status persediaan pakan dari jarak sensor ultrasonik.
+/// Menentukan status persediaan pakan dari jarak sensor ultrasonik. Batasnya
+/// sama dengan persentase di dasbor: jarak kosong berarti 0%, dan di bawah
+/// setengah wadah (di atas [SensorThresholds.feedHalfCm]) pakan menipis.
 StatusInfo feedLevelStatus(num? distanceCm) {
   if (distanceCm == null) {
     return const StatusInfo('Tidak diketahui', Severity.unknown);
   }
-  if (distanceCm > SensorThresholds.feedEmptyCm) {
+  if (distanceCm >= SensorThresholds.feedEmptyCm) {
     return const StatusInfo('Kosong', Severity.bad);
   }
   if (distanceCm > SensorThresholds.feedHalfCm) {
-    return const StatusInfo('Setengah', Severity.warning);
+    return const StatusInfo('Menipis', Severity.warning);
   }
-  return const StatusInfo('Penuh', Severity.good);
+  return const StatusInfo('Cukup', Severity.good);
 }
 
 /// Menentukan status kekeruhan air dari pembacaan NTU.

@@ -49,8 +49,8 @@ List<DeviceAlert> deviceAlerts(DeviceSnapshot device, DateTime now) {
     alerts.add(
       const DeviceAlert(
         AlertLevel.warning,
-        'Pakan tinggal setengah',
-        'Siapkan pakan untuk isi ulang dalam beberapa hari.',
+        'Pakan menipis',
+        'Isi wadah kurang dari setengah. Siapkan pakan untuk isi ulang.',
       ),
     );
   }

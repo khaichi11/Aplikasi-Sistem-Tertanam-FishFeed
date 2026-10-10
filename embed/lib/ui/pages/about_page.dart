@@ -67,9 +67,10 @@ class AboutPage extends StatelessWidget {
                   leading: const Icon(Icons.set_meal_outlined),
                   title: const Text('Pakan'),
                   subtitle: Text(
-                    'Jarak sensor ke pakan: penuh di bawah '
-                    '${_number(SensorThresholds.feedHalfCm)} cm, setengah sampai '
-                    '${_number(SensorThresholds.feedEmptyCm)} cm, kosong di atasnya.',
+                    'Jarak sensor ke pakan: cukup sampai '
+                    '${_number(SensorThresholds.feedHalfCm)} cm, menipis di bawah '
+                    '${_number(SensorThresholds.feedEmptyCm)} cm, dan kosong mulai '
+                    '${_number(SensorThresholds.feedEmptyCm)} cm.',
                   ),
                 ),
                 const Divider(indent: 56),

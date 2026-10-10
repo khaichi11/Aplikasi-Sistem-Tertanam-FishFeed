@@ -11,8 +11,11 @@ void main() {
     test('jarak besar berarti wadah kosong', () {
       expect(feedLevelStatus(6).severity, Severity.bad);
     });
-    test('jarak menengah berarti setengah', () {
+    test('jarak menengah berarti menipis', () {
       expect(feedLevelStatus(4).severity, Severity.warning);
+    });
+    test('tepat di ambang kosong berarti kosong, sama dengan isi 0%', () {
+      expect(feedLevelStatus(5).severity, Severity.bad);
     });
     test('jarak kecil berarti penuh', () {
       expect(feedLevelStatus(1).severity, Severity.good);

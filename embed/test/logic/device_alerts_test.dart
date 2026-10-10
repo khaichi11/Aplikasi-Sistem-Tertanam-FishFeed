@@ -41,7 +41,7 @@ void main() {
     final alerts = deviceAlerts(device(distance: 4, ntu: 80, battery: 15), now);
     expect(alerts.first.title, 'Baterai hampir habis');
     expect(alerts.skip(1).map((a) => a.title).toSet(), {
-      'Pakan tinggal setengah',
+      'Pakan menipis',
       'Air keruh',
     });
   });

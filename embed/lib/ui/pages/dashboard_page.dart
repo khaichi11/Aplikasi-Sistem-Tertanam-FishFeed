@@ -114,7 +114,12 @@ class _DashboardContent extends StatelessWidget {
                 const SizedBox(height: Gap.xl),
                 const _NextFeedingCard(),
                 const SizedBox(height: Gap.lg),
-                _FeedButton(enabled: device.id.isNotEmpty),
+                _FeedButton(
+                  enabled: device.id.isNotEmpty,
+                  empty:
+                      feedLevelStatus(device.distanceCm).severity ==
+                      Severity.bad,
+                ),
                 const SizedBox(height: Gap.xl),
                 _WeeklyCard(deviceId: device.id),
                 const SizedBox(height: Gap.xl),
@@ -573,17 +578,24 @@ String _sentence(String text) =>
     text.isEmpty ? text : text[0].toUpperCase() + text.substring(1);
 
 class _FeedButton extends StatelessWidget {
-  const _FeedButton({required this.enabled});
+  const _FeedButton({required this.enabled, this.empty = false});
 
   final bool enabled;
+
+  /// Wadah pakan terbaca kosong: perintah tetap boleh dikirim, tetapi
+  /// pengguna diberi tahu bahwa mungkin tidak ada pakan yang jatuh.
+  final bool empty;
 
   Future<void> _feed(BuildContext context) async {
     final ok = await confirm(
       context,
       title: 'Beri makan sekarang?',
       message:
-          'Perintah dikirim ke perangkat. Satu porsi pakan akan '
-          'dijatuhkan saat perangkat menerimanya.',
+          empty
+              ? 'Wadah pakan terbaca kosong, jadi mungkin tidak ada pakan yang '
+                  'jatuh. Isi ulang wadah terlebih dahulu bila memungkinkan.'
+              : 'Perintah dikirim ke perangkat. Satu porsi pakan akan '
+                  'dijatuhkan saat perangkat menerimanya.',
       confirmLabel: 'Beri makan',
     );
     if (!ok || !context.mounted) return;

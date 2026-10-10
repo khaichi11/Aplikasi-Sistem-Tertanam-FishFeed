@@ -1,4 +1,5 @@
 import '../models/feed_schedule.dart';
+import 'sensor_status.dart';
 
 /// Waktu pemberian pakan otomatis berikutnya, atau null bila penjadwalan
 /// nonaktif atau tidak ada waktu yang diaktifkan.
@@ -31,12 +32,13 @@ String timeUntil(DateTime target, DateTime now) {
 String formatHourMinute(int hour, int minute) =>
     '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}';
 
-/// Persentase isi wadah pakan dari jarak sensor ultrasonik. Jarak 1 cm atau
-/// kurang dianggap penuh, dan jarak sama dengan ambang kosong dianggap 0%.
+/// Persentase isi wadah pakan dari jarak sensor ultrasonik, memakai ambang
+/// yang sama dengan [feedLevelStatus]: jarak penuh atau kurang dianggap 100%,
+/// dan jarak kosong atau lebih dianggap 0%.
 double feedLevelFraction(
   double? distanceCm, {
-  double emptyCm = 5,
-  double fullCm = 1,
+  double emptyCm = SensorThresholds.feedEmptyCm,
+  double fullCm = SensorThresholds.feedFullCm,
 }) {
   if (distanceCm == null) return 0;
   final fraction = (emptyCm - distanceCm) / (emptyCm - fullCm);
